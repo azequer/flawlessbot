@@ -3,16 +3,19 @@ Flawless is a bot that has been in development since July 10, 2023
 It is known for being both a user and server bot
 
 # How to setup
-First off, u need
 
-- Node.js (any version thats above v16.6.0)
-- VS2022 Build Tools (for some libraries)
-- Python 3.8+ (same as above)
+## Dependencies
+  - Node.js (any version thats above v16.6.0)
+  - VS2022 Build Tools (for some libraries)
+  - Python 3.8+ (same as above)
 
-Then you run ``npm i``
-After running npm, go to data/config, create a new file named main.json and paste the below in it
-```json
-{
+## Command line part
+   You just need to run ``npm i``
+
+## Configuration
+   Go to data/config, create a new file named main.json and paste the below in it
+   ```json
+   {
     "token": "<bot token>",
     "owner": "<owner id>",
     "reportExceptions": true, //Used to report exceptions
@@ -26,6 +29,8 @@ After running npm, go to data/config, create a new file named main.json and past
     "debugPrintsEnabled": false, //Debug prints (useful for debugging errors)
     "bailWhenOnLowRam": true, //Refuses to execute when on low RAM
     "minimumRamMb": 100 //Minimum RAM before it thinks its running out of memory
-}
-```
-Then go into src and run ``node server`` and bam, now u have Flawless running!
+   }
+   ```
+
+## More command line stuff
+   Go into src and run ``node server`` and bam, now u have Flawless running!
