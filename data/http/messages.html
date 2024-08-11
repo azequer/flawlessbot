@@ -1,0 +1,146 @@
+<title>Flawless6788 - Messages</title>
+
+<a href="/">Home</a></br>
+<a href="/channels.html">Channels</a></br></br>
+
+<button onclick="loadMessages()">Load messages</button></br>
+<button onclick="loadSpecificMessages()">Load messages of user id</button></br>
+<table id="msgs" border="1">
+</table>
+
+<script>
+    let tableRow="tr";
+    let tableHeader="th";
+    let tableData="td";
+    //tableRow => tableHeader tableData tableData tableData
+    let count = 0;
+    
+    async function createChatMessageEntry(uid,msgt,isdm) {
+        count++;
+       
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = count;
+        msgtd1.innerHTML = '<a href=\'javascript:loadProfile("'+uid.replaceAll(" ", "")+'")\'>'+uid+'</a>';
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+
+    async function ecreateChatMessageEntry(uid,msgt,isdm) {
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = "#";
+        msgtd1.innerHTML = uid;
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+
+    async function acreateChatMessageEntry(ae,uid,msgt,isdm) {
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = ae;
+        msgtd1.innerHTML = uid;
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+
+    async function loadProfile(id) {
+        try {
+            let rep = await fetch("/getuserinfo?id="+id);
+            let jsv = await rep.json();
+            let neew = document.getElementById("msgs").innerHTML.replaceAll(id,jsv.username);
+            document.getElementById("msgs").innerHTML = neew;
+            window.open("/users/"+id);
+        } catch(e) {
+            alert("Something went wrong while loading that user profile, press Ctrl+Shift+I for more info");
+            console.log(e.message);
+            console.log(e.name);
+            console.log(e.stack);
+        }
+    }
+
+    async function loadMessages() {
+        count = 0;
+        document.getElementById("msgs").innerHTML = "";
+        acreateChatMessageEntry("MessageID","UserID","Message","IsDM");
+        let msgcount = 0;
+        try {
+            let rep = await fetch("/savedmessages");
+            let reparr = await rep.json();
+            console.log(reparr);
+            for (let key in reparr) {
+                if (reparr.hasOwnProperty(key)) {
+                    let value = reparr[key];
+                    ecreateChatMessageEntry("----", "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", "----");
+                    for(let i = 0; i < value.length; i++) {
+                        let thinggy = value[i];
+                        //console.log(thinggy.authorId);
+                        createChatMessageEntry(thinggy.authorId.replaceAll(" ", ""), thinggy.content, thinggy.dm);
+                        msgcount++;
+                    }
+                }
+            }
+            alert("Loaded "+msgcount+" messages");
+        } catch(e) {
+            alert("Error occured while loading messages, press Ctrl+Shift+I for more info");
+            console.log(e.message);
+            console.log(e.name);
+            console.log(e.stack);
+        }
+    }
+    async function loadSpecificMessages() {
+        count = 0;
+        document.getElementById("msgs").innerHTML = "";
+        acreateChatMessageEntry("MessageID","UserID","Message","IsDM");
+        let msgcount = 0;
+        try {
+            let rep = await fetch("/savedmessages");
+            let reparr = await rep.json();
+            console.log(reparr);
+            let udi = prompt("Select user ID to get messages from.");
+            for (let key in reparr) {
+                if (reparr.hasOwnProperty(key) && key == udi) {
+                    let value = reparr[key];
+                    ecreateChatMessageEntry("Section", key, "");
+                    for(let i = 0; i < value.length; i++) {
+                        let thinggy = value[i];
+                        //console.log(thinggy.authorId);
+                        createChatMessageEntry(thinggy.authorId.replaceAll(" ", ""), thinggy.content, thinggy.dm);
+                        msgcount++;
+                    }
+                }
+            }
+            alert("Loaded "+msgcount+" messages");
+        } catch(e) {
+            alert("Error occured while loading messages, press Ctrl+Shift+I for more info");
+            console.log(e.message);
+            console.log(e.name);
+            console.log(e.stack);
+        }
+    }
+    
+</script>

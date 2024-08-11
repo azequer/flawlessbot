@@ -1,0 +1,112 @@
+<title>Flawless6788 - UserInfo</title>
+
+<a href="/">Home</a></br>
+<a href="/channels.html">Channels</a></br>
+<a href="/messages.html">Messages</a></br></br>
+
+<script>
+let uid = "<%= username %>";
+</script>
+
+<img src="<%= useravatarurl %>" width="100" height="100" alt="<%= username %>"/><h4><%= username%></h4></br>
+
+<% if(userisowner) { %>
+    <h3>This user owns this instance of Flawless.</h3>
+<% } %>
+<% if(userhasguild) { %>
+    <h3>This user has a server named <%= userguildname %></h3>
+<% } %>
+
+<button onclick="loadSpecificMessages(<%= userid %>)">Load messages for this user</button></br>
+<table id="msgs" border="1">
+</table>
+
+<script>
+    let tableRow="tr";
+    let tableHeader="th";
+    let tableData="td";
+    //tableRow => tableHeader tableData tableData tableData
+    let count = 0;
+    
+    async function createChatMessageEntry(uid,msgt,isdm) {
+        count++;
+       
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = count;
+        msgtd1.innerHTML = uid;
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+
+    async function ecreateChatMessageEntry(uid,msgt,isdm) {
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = "#";
+        msgtd1.innerHTML = uid;
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+
+    async function acreateChatMessageEntry(ae,uid,msgt,isdm) {
+        var msgtr = document.createElement(tableRow);
+        var msgth = document.createElement(tableHeader);
+        var msgtd1 = document.createElement(tableData);
+        var msgtd2 = document.createElement(tableData);
+        var msgtd3 = document.createElement(tableData);
+        msgth.innerHTML = ae;
+        msgtd1.innerHTML = uid;
+        msgtd2.innerHTML = msgt;
+        msgtd3.innerHTML = isdm;
+        msgtr.appendChild(msgth);
+        msgtr.appendChild(msgtd1);
+        msgtr.appendChild(msgtd2);
+        msgtr.appendChild(msgtd3);
+        document.getElementById("msgs").appendChild(msgtr);
+    }
+    async function loadSpecificMessages(uid) {
+        count = 0;
+        document.getElementById("msgs").innerHTML = "";
+        acreateChatMessageEntry("MessageID","UserID","Message","IsDM");
+        let msgcount = 0;
+        try {
+            let rep = await fetch("/savedmessages");
+            let reparr = await rep.json();
+            console.log(reparr);
+            for (let key in reparr) {
+                if (reparr.hasOwnProperty(key) && key == uid) {
+                    let value = reparr[key];
+                    ecreateChatMessageEntry("Section", key, "");
+                    for(let i = 0; i < value.length; i++) {
+                        let thinggy = value[i];
+                        //console.log(thinggy.authorId);
+                        createChatMessageEntry(thinggy.authorId.replaceAll(" ", ""), thinggy.content, thinggy.dm);
+                        msgcount++;
+                    }
+                }
+            }
+        } catch(e) {
+            alert("Error occured while loading messages, press Ctrl+Shift+I for more info");
+            console.log(e.message);
+            console.log(e.name);
+            console.log(e.stack);
+        }
+    }
+    
+</script>

@@ -1,0 +1,18 @@
+<title>Flawless6788 - Index</title>
+<h3>Welcome to Flawless6788 Control Panel</h3></br>
+<a href="/channels.html">Channels</a></br>
+<a href="/messages.html">Messages</a></br></br>
+
+<button onclick="shutDown()">Shutdown bot</button>
+<button onclick="reloadB()">Reload bot</button>
+
+<script>
+    async function shutDown() {
+        fetch("/kill");
+        fetch("/exit");
+    }
+
+    async function reloadB() {
+        fetch("/reloadBot");
+    }
+</script>

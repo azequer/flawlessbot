@@ -1,0 +1,35 @@
+<title>Flawless 6788 - GuildView</title>
+
+<h3><%= guild.name %></h3>
+
+<h3>Members</h3>
+<table id="members" border="1">
+    <tr>
+        <th>Num</th>
+        <td>Name</td>
+    </tr>
+    <% let i = 0 %>
+    <% guild.members.cache.each(async (chan) => { %>
+        <% i++; %>
+        <tr>
+            <th><%= i %></th>
+            <td><a href="/users/<%= chan.user.id %>"><%= chan.user.username %></a></td>
+        </tr>
+    <% }) %>
+</table></br>
+
+<h3>Channels</h3>
+<table id="channels" border="1">
+    <tr>
+        <th>Num</th>
+        <td>Name</td>
+    </tr>
+    <% i = 0 %>
+    <% guild.channels.cache.each(async (chan) => { %>
+        <% i++; %>
+        <tr>
+            <th><%= i %></th>
+            <td><a href="/channels/<%= chan.id %>"><%= chan.name %></a></td>
+        </tr>
+    <% }) %>
+</table>

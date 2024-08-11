@@ -1,0 +1,38 @@
+<title>Flawless6788 - Channels</title>
+
+<a href="/">Home</a></br>
+<a href="/messages.html">Messages</a></br></br>
+
+<script>
+    async function getChannelInfo() {
+        let chid = document.getElementById("chid").value;
+        const response = await fetch('/getinfo?id='+chid);
+        const data = await response.json();
+        alert("Channel Name: "+data.channelName+", Guild Name: "+data.guildName+", Guild ID: "+data.guildId);
+    }
+    async function changeChannelId() {
+        let chid = document.getElementById("chid").value;
+        const response = await fetch('/change?id='+chid);
+    }
+    async function sendMessage() {
+        let chid = document.getElementById("chid").value;
+        let rep = prompt("Enter message that u wanna send.", "hi");
+        if(rep !== null) {
+            const response = await fetch('/message?msg='+rep);
+        }
+    }
+    async function replyMessage() {
+        let chid = document.getElementById("chid").value;
+        let repq = prompt("Enter the id of the message that u wanna reply to.", "none");
+        let rep = prompt("Enter message that u wanna send.", "hi");
+        if(rep !== null && repq !== null && repq !== "none") {
+            const response = await fetch('/messagereq?id='+repq+'?msg='+rep);
+        }
+    }
+</script>
+
+<input id="chid" type="text" placeholder="Channel id"></input></br>
+<button onclick="getChannelInfo()">Get channel info</button></br>
+<button onclick="changeChannelId()">Change request channel ID</button></br>
+<button onclick="sendMessage()">Send message</button></br>
+<button onclick="replyMessage()">Reply to message</button>

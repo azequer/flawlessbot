@@ -1,0 +1,21 @@
+<title>Flawless 6788 - ChannelView</title>
+
+<h3><%= guild.name %></h3>
+
+<h3>Messages</h3>
+<table id="messages" border="1">
+    <tr>
+        <th>Num</th>
+        <td>Author</td>
+        <td>Message</td>
+    </tr>
+    <% let i = 0 %>
+    <% guild.messages.cache.each(async (chan) => { %>
+        <% i++; %>
+        <tr>
+            <th><%= i %></th>
+            <td><%= chan.author.username %></td>
+            <td><label><%= chan.content %></label></td>
+        </tr>
+    <% }) %>
+</table>
