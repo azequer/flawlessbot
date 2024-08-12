@@ -142,11 +142,6 @@ import { simpleGit } from "simple-git";
 
 let localGit = simpleGit(__dirname+"/../../");
 
-function updateCheck() {
-  let statgit = localGit.status();
-  statgit
-}
-
 //stream, util n fs!!
 import * as stream from 'stream';
 import util, { promisify } from 'util';
@@ -2305,10 +2300,31 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
   //filterMessage(message);
 });
 
+async function quickShutdown() {
+  client.destroy();
+  process.exit(0);
+}
+
+async function updateCheck() {
+  try {
+  await localGit.remote([ "update" ]);
+  let statgit = await localGit.status();
+  if(statgit.behind > 0) {
+    await localGit.pull();
+  }
+  } catch(e) { console.error("Failed to update!"); quickShutdown(); }
+}
+
 //logging in
 client.login(tokk);
 
+let howManyticks = 0;
+
 function onGlobalTick() {
+  howManyticks++;
+  if (howManyticks >= 2) {
+    updateCheck();
+  }
   try {
   let guildNum = client.guilds.cache.size;
   client.user.setPresence({
