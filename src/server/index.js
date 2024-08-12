@@ -2311,7 +2311,9 @@ async function updateCheck() {
   let statgit = await localGit.status();
   if(statgit.behind > 0) {
     await localGit.pull();
+    quickShutdown();
   }
+  console.log(statgit);
   } catch(e) { console.error("Failed to update!"); quickShutdown(); }
 }
 
