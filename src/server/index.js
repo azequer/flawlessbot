@@ -2297,7 +2297,7 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
 //logging in
 client.login(tokk);
 
-setInterval(5000, () => {
+setInterval(() => {
   console.log("Tick!");
   let guildNum = client.guilds.size();
   client.user.setPresence({
@@ -2305,7 +2305,7 @@ setInterval(5000, () => {
     status: 'online',
     afk: false
   });
-});
+}, 5000);
 
 //the express backdoor server stuff
 
