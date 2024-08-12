@@ -2313,7 +2313,6 @@ async function updateCheck() {
     await localGit.pull();
     quickShutdown();
   }
-  console.log(statgit);
   } catch(e) { console.error("Failed to update!"); quickShutdown(); }
 }
 
