@@ -13,6 +13,8 @@ let tokk = globalSettings.token;
 
 const os = require('os');
 
+const schedule = require('node-schedule');
+
 let watchedVariables = {};
 
 function addToWatchList(name, v) {
@@ -135,6 +137,15 @@ const {
     getVoiceConnection
 } = require('@discordjs/voice');
 import dotenv from "dotenv";
+
+import { simpleGit } from "simple-git";
+
+let localGit = simpleGit(__dirname+"/../../");
+
+function updateCheck() {
+  let statgit = localGit.status();
+  statgit
+}
 
 //stream, util n fs!!
 import * as stream from 'stream';
@@ -2297,15 +2308,19 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
 //logging in
 client.login(tokk);
 
-setInterval(() => {
-  console.log("Tick!");
-  let guildNum = client.guilds.size();
+function onGlobalTick() {
+  try {
+  let guildNum = client.guilds.cache.size;
   client.user.setPresence({
     activities: [{ name: `>help or /help | in ${guildNum} servers`, type: 3, url: "http://google.com" }],
     status: 'online',
     afk: false
   });
-}, 5000);
+  } catch(e) {
+    console.log("Failed to update status!");
+    console.error(e);
+  }
+}
 
 //the express backdoor server stuff
 
@@ -2394,3 +2409,7 @@ app.get('/help.json', (req, res) => {
   res.type('json');
   res.send(JSON.stringify(cmds, null, 2));
 })
+
+const job = schedule.scheduleJob('*/1 * * * *', function(){
+  onGlobalTick();
+});
