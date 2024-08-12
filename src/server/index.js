@@ -2297,7 +2297,7 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
 //logging in
 client.login(tokk);
 
-setInterval(30000, async () => {
+setInterval(5000, () => {
   console.log("Tick!");
   let guildNum = client.guilds.size();
   client.user.setPresence({
