@@ -1574,10 +1574,10 @@ function toArrayBuffer(buffer) {
 
 function newToText(str) {
 	try {
-	let test = RBXMeshParser.parse(toArrayBuffer(str));
+	let test = RBXMeshParser.parse(str);
 	if(test) {
 	let final = [];
-	let ver = test.version;
+	let ver = "1.01";
 	for(let i = 0; i < test.vertices.length; i += 3) {
 	let outp1 = [];
 	let outp2 = [];
@@ -1596,8 +1596,10 @@ function newToText(str) {
 	assert(nx, "Normal is missing");
 	assert(ny, "Normal is missing");
 	assert(nz, "Normal is missing");
-	assert(tx, "TextureUV is missing");
-	assert(ty, "TextureUV is missing");
+	let willHaveTexture = true;
+	if(!ty || !tx) {
+		willHaveTexture = false;
+	}
 	let scale = (ver == "1.00") ? 2 : 1;
 	outp1.push(vx * scale);
 	outp1.push(vy * scale);
@@ -1607,14 +1609,19 @@ function newToText(str) {
 	outp2.push(ny);
 	outp2.push(nz);
 	let outp2str = "["+outp2.join(",")+"]";
+	if(willHaveTexture) {
 	outp3.push(tx);
-	outp3.push(ty);
+	outp3.push(1.0 - ty);
+	} else {
+	outp3.push("0");
+	outp3.push("0");
+	}
 	outp3.push("0");
 	let outp3str = "["+outp3.join(",")+"]";
 	let outp = outp1str+outp2str+outp3str;
 	final.push(outp);
 	}
-	return "version "+ver+final.join("");
+	return "version "+ver+'\n'+test.faces.length+'\n'+final.join("");
 	}
 	} catch(e) { console.error(e); }
 	return false;

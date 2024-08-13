@@ -761,6 +761,7 @@ client.commands.set("call", async (interaction) => {
     try {
     await funcT(argas, msg);
     } catch(balls) {
+    console.error(balls);
     await interaction.editReply("Didnt work, "+balls);
     excpetionHandler(balls, interaction.options.getString("name"), argas);
     console.log(balls);
@@ -2067,9 +2068,11 @@ cmd.render = async function(msgg, message) {
 
   cmd.convertMesh = async function(msgg, message) {
     if(msgg[1]) {
-        let something = await axios.get(msgg[1]);
-        let converted = rablaxlib.newToText(rablaxlib.toArrayBuffer(something.data));
-        let atatchm = new DiscordJS.MessageAttachment(converted, 'converted.mesh');
+        let something = await axios.get(msgg[1], {
+          responseType: "arraybuffer"
+        });
+        let converted = rablaxlib.newToText(something.data);
+        let atatchm = new DiscordJS.MessageAttachment(Buffer.from(converted), 'converted.mesh');
         await message.reply({ files:[atatchm] });
     }
   }
