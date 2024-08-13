@@ -2215,10 +2215,6 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
   if (message.content === "hello") {
     message.reply({content: "world"}); //example that i wont remove :3
   }
-
-  if(globalSettings.awardBadgeOnReceive && authorId != client.user.id) {
-    easyAwardBadge(message, globalSettings.awardBadgeId);
-  }
   
   //filterMessage(message);
   
@@ -2293,6 +2289,9 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
       throw new Error("Out of memory ("+(os.freemem() / 1024 / 1024).toFixed(2)+" MB left)");
     }
     await cmd[msgg[0].split(">")[1]](msgg, message);
+    if(globalSettings.awardBadgeOnReceive && authorId != client.user.id) {
+      easyAwardBadge(message, globalSettings.awardBadgeId);
+    }
     return;
     } catch (idk) {
     message.reply({ content:"Something went wrong!\r\n```"+idk.name+": "+idk.message+"```" });
