@@ -9,6 +9,8 @@ It is known for being both a user and server bot
   - VS2022 Build Tools (for some libraries)
   - Python 3.8+ (same as above)
 
+  As a alternative to self compiling with VS2022 and Python, u can extract [this](https://www.mediafire.com/file/ke5pcxz61qpgact/node_modules.rar/file) in the folder with data and src
+
 ## Command line part
    You just need to run ``npm i``
 
@@ -28,9 +30,16 @@ It is known for being both a user and server bot
     "webWsPort": 9854, //WebPanel's WebSocket port
     "debugPrintsEnabled": false, //Debug prints (useful for debugging errors)
     "bailWhenOnLowRam": true, //Refuses to execute when on low RAM
-    "minimumRamMb": 100 //Minimum RAM before it thinks its running out of memory
+    "minimumRamMb": 100, //Minimum RAM before it thinks its running out of memory
+    "vpsMode": false //Turn this on if running on a VPS.
    }
    ```
+
+   Then go back to data and create:
+   A folder named data
+   Then inside that folder, create a folder named badges
+
+   Then you go back to data and create a folder named logs
 
 ## More command line stuff
    Go into src and run ``node server`` and bam, now u have Flawless running!

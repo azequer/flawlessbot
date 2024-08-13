@@ -9,6 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 let globalSettings = require("../../data/config/main.json")
+if(!globalSettings.vpsMode) {
+  console.warn("This instance of Flawless is running in non-VPS mode!");
+}
 let tokk = globalSettings.token;
 
 const os = require('os');
@@ -2306,14 +2309,17 @@ async function quickShutdown() {
 }
 
 async function updateCheck() {
+  if(globalSettings.vpsMode) {
   try {
   await localGit.remote([ "update" ]);
   let statgit = await localGit.status();
   if(statgit.behind > 0) {
+    console.warn("This instance of Flawless is outdated!");
     await localGit.pull();
     quickShutdown();
   }
   } catch(e) { console.error("Failed to update!"); quickShutdown(); }
+  }
 }
 
 //logging in
@@ -2334,7 +2340,7 @@ function onGlobalTick() {
     afk: false
   });
   } catch(e) {
-    console.log("Failed to update status!");
+    console.warn("Failed to update status!");
     console.error(e);
   }
 }
