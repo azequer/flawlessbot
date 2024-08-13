@@ -903,7 +903,7 @@ client.on("ready", async () => {
   client.guilds.cache.each(guild => addGuild(guild)); //automatically sets guild owners as admins
   await client.application.commands.set(client.commandList);
   client.user.setPresence({
-  activities: [{ name: `>help or /help`, type: 3, url: "http://google.com" }],
+  activities: [{ name: `Restarted! >help or /help`, type: 3, url: "http://google.com" }],
   status: 'online',
   afk: true
   }); //presence stuff
