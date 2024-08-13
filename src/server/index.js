@@ -155,7 +155,7 @@ const { v4: uuidv4, v1: uuidv1 } = require('uuid');
 
 const uuidtd = require('../base/uuidlib/index.cjs');
 
-const rablaxlib = require('../base/rbxlib/rbxlib.js');
+const rablaxlib = require('../base/rbxlib/rbxlib.cjs');
 
 const crypto = require('crypto');
 
