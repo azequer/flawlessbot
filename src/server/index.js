@@ -2067,9 +2067,7 @@ cmd.render = async function(msgg, message) {
 
   cmd.convertMesh = async function(msgg, message) {
     if(msgg[1]) {
-        let something = axios.get(msgg[1]);
-        console.log(something);
-        console.log(something.data);
+        let something = await axios.get(msgg[1]);
         let converted = rablaxlib.newToText(rablaxlib.toArrayBuffer(something.data));
         let atatchm = new DiscordJS.MessageAttachment(converted, 'converted.mesh');
         await message.reply({ files:[atatchm] });
