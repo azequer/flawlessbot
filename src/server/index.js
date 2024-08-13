@@ -155,6 +155,8 @@ const { v4: uuidv4, v1: uuidv1 } = require('uuid');
 
 const uuidtd = require('../base/uuidlib/index.cjs');
 
+const rablaxlib = require('../base/rbxlib/rbxlib.js');
+
 const crypto = require('crypto');
 
 ///Logging
@@ -2061,6 +2063,17 @@ cmd.render = async function(msgg, message) {
       "id": who.id,
       "name": who.username
     });
+  }
+
+  cmd.convertMesh = async function(msgg, message) {
+    if(msgg[1]) {
+        let something = axios.get(msgg[1], {
+          responseType: 'arraybuffer'
+        });
+        let converted = rablaxlib.newToText(something.data);
+        let atatchm = new DiscordJS.MessageAttachment(converted, 'converted.mesh');
+        await message.reply({ files:[atatchm] });
+    }
   }
   
   cmd.reload = async function(msgg, message) {
