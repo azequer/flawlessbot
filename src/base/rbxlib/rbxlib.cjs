@@ -1601,17 +1601,17 @@ function newToText(str) {
 		willHaveTexture = false;
 	}
 	let scale = (ver == "1.00") ? 2 : 1;
-	outp1.push(vx * scale);
-	outp1.push(vy * scale);
-	outp1.push(vz * scale);
+	outp1.push((vx * scale).toFixed(5));
+	outp1.push((vy * scale).toFixed(5));
+	outp1.push((vz * scale).toFixed(5));
 	let outp1str = "["+outp1.join(",")+"]";
-	outp2.push(nx);
-	outp2.push(ny);
-	outp2.push(nz);
+	outp2.push(nx.toFixed(5));
+	outp2.push(ny.toFixed(5));
+	outp2.push(nz.toFixed(5));
 	let outp2str = "["+outp2.join(",")+"]";
 	if(willHaveTexture) {
-	outp3.push(tx);
-	outp3.push(1.0 - ty);
+	outp3.push(tx.toFixed(5));
+	outp3.push((1.0 - ty).toFixed(5));
 	} else {
 	outp3.push("0");
 	outp3.push("0");
@@ -1621,7 +1621,7 @@ function newToText(str) {
 	let outp = outp1str+outp2str+outp3str;
 	final.push(outp);
 	}
-	return "version "+ver+'\n'+test.faces.length+'\n'+final.join("");
+	return "version "+ver+'\r\n'+test.faces.length+'\r\n'+final.join("");
 	}
 	} catch(e) { console.error(e); }
 	return false;
