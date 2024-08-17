@@ -2331,7 +2331,7 @@ async function updateCheck() {
     await localGit.pull();
     quickShutdown();
   }
-  } catch(e) { console.error("Failed to update!"); quickShutdown(); }
+  } catch(e) {}
   }
 }
 
