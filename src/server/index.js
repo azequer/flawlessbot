@@ -401,14 +401,14 @@ let radnom = radnom1.filter(item => {
   if(isValid) {
     let splitla = item.split(" ");
     if(splitla.length == 8) { //no git hash
-      let yearll = splitla[5].split("/");
+      let yearll = splitla[4].split("/");
       let yearballs = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
       let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yearballs };
       testParsed.push(slobj);
     }
     if(splitla.length == 13) { //no git hash, file ver
-      let yearll = splitla[5].split("/");
+      let yearll = splitla[4].split("/");
       let yearballs = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
       let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
@@ -1580,37 +1580,40 @@ cmd.render = async function(msgg, message) {
     }
   }
   
-  register("bing", "Returns a image from Bing. (thx UTels <3)");
+  register("bing", "Returns a image from Bing.");
   
   cmd.randomdeployhistory = async function(msgg, message) {
     if (msgg[0] == ">randomdeployhistory") {
       let infol = "";
       let thiang = testParsed.filter(item => {
-        if(msgg[1] && Number.parseInt(msgg[1]) != NaN && Number.parseInt(msgg[1]) != null) {
-          infol = "1 is valid int";
+        if(Number.parseInt(msgg[1])) {
+          infol = "1 is valid int (parseint)";
           if(msgg[2]) {
-            infol = "1 is valid int, 2 is valid int";
+            infol = "1 is valid int, 2 is valid";
             let yeart = Number.parseInt(msgg[2]);
-            if(yeart != null && yeart != NaN) {
-              infol = "1 is valid int, 2 is valid int and year";
+            if(yeart) {
+              infol = "1 is valid int, 2 is valid int";
               if(msgg[3]) {
-                infol = "1 is valid int, 2 is valid int and year, 3 is type";
                 if(yeart >= 2009) { //wheat
+				  infol = "1 is valid int, 2 is valid int and year, 3 is type";
                   if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
                     return true;
                   }
                 } else { //version
+				  infol = "1 is valid int, 2 is valid int";
                   if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
                     return true;
                   }
                 }
               } else {
-                infol = "1 is valid int, 2 is valid int and year";
+                
                 if(yeart >= 2009) { //wheat
+		  infol = "1 is valid int, 2 is valid int and year";
                   if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2])) {
                     return true;
                   }
                 } else { //version
+		  infol = "1 is valid int, 2 is valid int";
                   if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
                     return true;
                   }
@@ -1618,14 +1621,21 @@ cmd.render = async function(msgg, message) {
               }
             } else {
               infol = "1 is valid int, 2 is type";
+              if(yeart >= 2009) { //wheat
+			  infol = "1 is valid int and year, 2 is type";
+              if(item.vyear == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+                return true;
+              }
+            } else { //version
               if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
                 return true;
               }
             }
+            }
           } else {
-            infol = "1 is valid int";
-            let yeart = Number.parseInt(msgg[2]);
-            if(yeart != null && yeart != NaN) {
+            let yeart = Number.parseInt(msgg[1]);
+            if(yeart) {
+	    infol = "1 is valid int (msgg 2 else)";
             if(yeart >= 2009) { //wheat
               if(item.vyear == Number.parseInt(msgg[1])) {
                 return true;
@@ -1635,21 +1645,22 @@ cmd.render = async function(msgg, message) {
                 return true;
               }
             }
-            } else {
-            infol = "1 is type";
-            if(item.vtype == msgg[1]) {
-              return true;
-            }
             }
           }
-        }
+        } else if(msgg[1]) {
+	  infol = "1 is type (else)";
+          if(item.vtype == msgg[1]) {
+            return true;
+          }
+	}
+	if(msgg[1] == undefined || msgg[1] == null) { return true; }
         return false;
       });
       let shitlb = thiang[getRandomInt(thiang.length + 1)];
       if(shitlb) {
-        message.reply({ content: "```"+shitlb.vorig+"```" });
+        message.reply({ content: "```"+infol+"\n"+shitlb.vorig+"```" });
       } else {
-        message.reply({ content: "```No version found.```" });
+        message.reply({ content: "```"+infol+"\nNo version found.```" });
       }
     }
   }
