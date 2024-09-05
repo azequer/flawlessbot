@@ -134,4 +134,5 @@ data/config/main.json
 data/data/badges/*
 data/downloads/*
 data/logs/*
+data/base/db.json
 node_modules.rar
