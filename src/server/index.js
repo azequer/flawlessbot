@@ -388,12 +388,34 @@ addToWatchList("startupUUID", startupUUID);
 
 console.log("Loading deploy history..");
 
+let testParsed = [];
+
 let test = await axios.get("https://setup.rbxcdn.com/DeployHistory.txt");
      
 let radnom1 = test.data.split('\n');
 
 let radnom = radnom1.filter(item => {
-  return item.includes("...") == false ? false : true;
+  let isValid = item.includes("New");
+  //New RccService version-336605f55f6847b4 at 11/10/2009 3:35:29 PM... Done!
+  //New RccService version-978fdda2ac634c5b at 4/6/2011 11:21:51 PM, file verion: 0, 37, 0, 13...Done!
+  if(isValid) {
+    let splitla = item.split(" ");
+    if(splitla.length == 8) { //no git hash
+      let yearll = splitla[5].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yearballs };
+      testParsed.push(slobj);
+    }
+    if(splitla.length == 13) { //no git hash, file ver
+      let yearll = splitla[5].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testParsed.push(slobj);
+    }
+  }
+  return isValid == false ? false : true;
 });
 
 let radnomPos = 0;
@@ -1562,8 +1584,73 @@ cmd.render = async function(msgg, message) {
   
   cmd.randomdeployhistory = async function(msgg, message) {
     if (msgg[0] == ">randomdeployhistory") {
-      
-      message.reply({ content: "```"+radnom[getRandomInt(radnom.length + 1)]+"```" });
+      let infol = "";
+      let thiang = testParsed.filter(item => {
+        if(msgg[1] && Number.parseInt(msgg[1]) != NaN && Number.parseInt(msgg[1]) != null) {
+          infol = "1 is valid int";
+          if(msgg[2]) {
+            infol = "1 is valid int, 2 is valid int";
+            let yeart = Number.parseInt(msgg[2]);
+            if(yeart != null && yeart != NaN) {
+              infol = "1 is valid int, 2 is valid int and year";
+              if(msgg[3]) {
+                infol = "1 is valid int, 2 is valid int and year, 3 is type";
+                if(yeart >= 2009) { //wheat
+                  if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                    return true;
+                  }
+                } else { //version
+                  if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                    return true;
+                  }
+                }
+              } else {
+                infol = "1 is valid int, 2 is valid int and year";
+                if(yeart >= 2009) { //wheat
+                  if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2])) {
+                    return true;
+                  }
+                } else { //version
+                  if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+                    return true;
+                  }
+                }
+              }
+            } else {
+              infol = "1 is valid int, 2 is type";
+              if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+                return true;
+              }
+            }
+          } else {
+            infol = "1 is valid int";
+            let yeart = Number.parseInt(msgg[2]);
+            if(yeart != null && yeart != NaN) {
+            if(yeart >= 2009) { //wheat
+              if(item.vyear == Number.parseInt(msgg[1])) {
+                return true;
+              }
+            } else { //version
+              if(item.vvernum == Number.parseInt(msgg[1])) {
+                return true;
+              }
+            }
+            } else {
+            infol = "1 is type";
+            if(item.vtype == msgg[1]) {
+              return true;
+            }
+            }
+          }
+        }
+        return false;
+      });
+      let shitlb = thiang[getRandomInt(thiang.length + 1)];
+      if(shitlb) {
+        message.reply({ content: "```"+shitlb.vorig+"```" });
+      } else {
+        message.reply({ content: "```No version found.```" });
+      }
     }
   }
   
@@ -2074,6 +2161,51 @@ cmd.render = async function(msgg, message) {
         let converted = rablaxlib.newToText(something.data);
         let atatchm = new DiscordJS.MessageAttachment(Buffer.from(converted), 'converted.mesh');
         await message.reply({ files:[atatchm] });
+    }
+  }
+
+  cmd.getAllVersions = async function(msgg, message) {
+    if(msgg[1] && Number.parseInt(msgg[1]) != NaN && Number.parseInt(msgg[1]) != null) {
+      let thiang = testParsed.filter(item => {
+        if(msgg[2] && Number.parseInt(msgg[2]) != NaN && Number.parseInt(msgg[2]) != null) {
+          if(msgg[3]) {
+            if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+              return true;
+            }
+          } else {
+            if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+              return true;
+            }
+          }
+        } else {
+          if(msgg[2]) {
+            if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          } else {
+            if(item.vvernum == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+      let holyhsit = new MessageEmbed()
+      holyhsit.setTitle("VersionView");
+      let warn = false;
+      for(let i = 0; i < thiang.length; i++) {
+        let thling = thiang[i];
+        if(i < 25) {
+          holyhsit.addField("Entry #"+(i+1), "Version: "+thling.vvernum+" build "+thling.vvernumbuild, true);
+        } else {
+          if(!warn) {
+            warn = true;
+            holyhsit.setDescription("Warning: more than 25 entries; displaying only 1-25 entries");
+          }
+        }
+      }
+      holyhsit.setFooter("Showing "+thiang.length+" out of "+testParsed.length+" versions.");
+      message.reply({ embeds:[holyhsit] });
     }
   }
   
