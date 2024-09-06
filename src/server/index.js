@@ -168,9 +168,15 @@ addToWatchList("filenaem", filenaem);
 var log_file = fs.createWriteStream(filenaem, {flags : 'w'});
 var log_stdout = process.stdout;
 
+const regexalig = /\((.*):(\d+):(\d+)\)$/
+
+const path = require("path");
+const moment = require("moment");
+
 console.log = function(d) { //
-  log_file.write(util.format("[INFO] %s",d) + '\n');
-  log_stdout.write(util.format("[INFO] %s",d) + '\n');
+  const column = moment().format("YYYY-MM-DD HH:mm:ss");
+  log_file.write(util.format("[%s] [INFO] %s",column,d) + '\n');
+  log_stdout.write(util.format("[%s] [INFO] %s",column,d) + '\n');
 };
 
 console.error = function(d) { //
@@ -213,6 +219,33 @@ function reloadDb() {
     db = {};
     console.error(eee);
     }
+}
+
+let stateDb = {};
+console.log("Opening StateDatabase file..");
+try {
+stateDb = JSON.parse(fs.readFileSync("../data/base/state.json"));
+} catch (eee) {
+stateDb = {};
+console.error(eee);
+}
+
+function stateSave() {
+fs.writeFile('../data/base/state.json', JSON.stringify(stateDb, null, 2), function(){});
+}
+
+function stateGet(name) {
+if(stateDb[name]) {
+return stateDb[name];
+} else {
+stateDb[name] = {};
+return stateDb[name];
+}
+}
+
+function stateSet(name, val) {
+stateDb[name] = val;
+stateSave();
 }
 
 let badgeDb = {};
@@ -734,9 +767,15 @@ let viewbadInfo = new FWButtonInfo()
         .setIsOwnerOnly(true)
         .setId("viewbadge");
 
+let ballrollThing = new FWButtonInfo()
+        .setIsOwnerOnly(true)
+        .setId("ballroll");
+
 client.buttonCommandInfo.set("testign", testignInfo);
 
 client.buttonCommandInfo.set("viewbadge", viewbadInfo);
+
+client.buttonCommandInfo.set("ballroll", ballrollThing);
 
 onVarChange("client.commandList", client.commandList);
 
@@ -752,9 +791,7 @@ addToWatchList("client.buttonCommands", client.buttonCommands);
 
 client.commands.set("ping", async (interaction) => {
   if(!permissionCheck(interaction, true, "SEND_MESSAGES")) { await interaction.reply({ content:"I cannot send messages in here!", ephemeral: true }); return; }
-    console.log(interaction.createdAt);
-    let timing = new Date().getTime()-interaction.createdAt.getTime();
-    await interaction.reply("Pong! It took "+timing+"ms to process this.");
+    await interaction.reply("Pong! My ping is"+Math.round(client.ws.ping)+"ms.");
 });
 
 client.commands.set("call", async (interaction) => {
@@ -830,6 +867,21 @@ client.commands.set("call2", client.commands.get("call"));
 
 client.commands.set("invitelink2", client.commands.get("invitelink"));
 
+client.buttonCommands.set("ballroll", async (interaction) => {
+  let lineas = fs.readFileSync("../data/assets/8ball.txt").toString().split("\n");
+    let linerand = lineas[getRandomInt(lineas.length + 1)];
+    let holyhsit = new MessageEmbed()
+            .setTitle("The balls says...")
+            .setDescription(linerand);
+            const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setLabel('Re-roll')
+                    .setStyle('PRIMARY')
+                    .setCustomId('ballroll') 
+            );
+  await interaction.update({ embeds:[holyhsit], components:[row] });
+});
 
 client.buttonCommands.set("testign", async (interaction) => {
   await interaction.update("Holy fuck, client.buttonCommands!!!");
@@ -992,7 +1044,7 @@ client.on("voiceStateUpdate", (oldVoiceState, newVoiceState) => { // Listeing to
 });
 
 function getVersion() {
-  return "Version 1.0 Revision 98 (platform "+os.platform()+", version = "+os.version()+")"; //curr version
+  return "Version 1.1 Revision 10 (platform "+os.platform()+", version = "+os.version()+")"; //curr version
 }
 
 //the command system
@@ -2218,6 +2270,23 @@ cmd.render = async function(msgg, message) {
       holyhsit.setFooter("Showing "+thiang.length+" out of "+testParsed.length+" versions.");
       message.reply({ embeds:[holyhsit] });
     }
+  }
+
+  cmd.ball = async function(msgg, message) {
+    let lineas = fs.readFileSync("../data/assets/8ball.txt").toString().split("\n");
+    let linerand = lineas[getRandomInt(lineas.length + 1)];
+    let holyhsit = new MessageEmbed()
+            .setTitle("The balls says...")
+            .setDescription(linerand);
+            const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setLabel('Re-roll')
+                    .setStyle('PRIMARY')
+                    .setCustomId('ballroll') 
+            );
+
+    message.reply({ embeds:[holyhsit], components:[row] });
   }
   
   cmd.reload = async function(msgg, message) {
