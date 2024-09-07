@@ -31,7 +31,8 @@ It is known for being both a user and server bot
     "debugPrintsEnabled": false, //Debug prints (useful for debugging errors)
     "bailWhenOnLowRam": true, //Refuses to execute when on low RAM
     "minimumRamMb": 100, //Minimum RAM before it thinks its running out of memory
-    "vpsMode": false //Turn this on if running on a VPS.
+    "vpsMode": false, //Turn this on if running on a VPS.
+    "catKey": "placeholder" //Cat API key
    }
    ```
 
@@ -43,3 +44,13 @@ It is known for being both a user and server bot
 
 ## More command line stuff
    Go into src and run ``node server`` and bam, now u have Flawless running!
+
+# Support server
+
+## Official link
+   https://discord.gg/J8duVdMZ3f
+
+# Your own support server
+
+## Template link
+   https://discord.new/4PsxSR3XAbRU

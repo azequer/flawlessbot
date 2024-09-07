@@ -1,6 +1,7 @@
 let emitter = undefined;
 let discordjs = undefined;
 let axios = undefined;
+let settings = {};
 
 const stream = require("stream");
 
@@ -33,13 +34,8 @@ function onMessage(msgg, message) {
 }
 
 async function onCat(msgg, message) {
-//X-API-KEY
-//live_sVIFizHs44u7uF7nlQM6JjCBInL1DSVvbxOdfYuGZRdeOcnihLKaJMhja4EZn00g
-//?has_breeds=true&mime_types=jpg,png&size=small&sub_id=id&limit=1
-//https://api.thecatapi.com
-//v1/images/search
 try {
-const test = await axios.get("https://api.thecatapi.com/v1/images/search?has_breeds=true&mime_types=jpg,png&size=small&sub_id="+message.author.id+"&limit=1", {headers:{'X-API-KEY': "live_sVIFizHs44u7uF7nlQM6JjCBInL1DSVvbxOdfYuGZRdeOcnihLKaJMhja4EZn00g"}});
+const test = await axios.get("https://api.thecatapi.com/v1/images/search?has_breeds=true&mime_types=jpg,png&size=small&sub_id="+message.author.id+"&limit=1", {headers:{'X-API-KEY': settings.catKey}});
 console.log(test.data);
 const image = test.data[0];
 
@@ -192,6 +188,9 @@ function init(emitter1, discardr, axi) {
         emitter.emit("registerCmd", onRenderModelRCC, true, "renderModelRCC", "script executor v3");
         emitter.emit("registerCmd", onRenderGameRCC, true, "renderGameRCC", "script executor v4");
         emitter.emit("registerCmd", onGetJobsRCC, true, "getJobsRCC", "script executor v5");
+    });
+    emitter.on("settings", (shit) => {
+        settings = shit;
     });
 }
 

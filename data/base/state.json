@@ -1,1 +1,29 @@
-{}
+{
+  "embdb": {
+    "1281667188813729903": [
+      ">randomdeployhistory",
+      "noargs"
+    ],
+    "1281677049207197835": [
+      ">randomdeployhistory",
+      "2016",
+      "WindowsPlayer"
+    ],
+    "1281677177988845681": [
+      ">randomdeployhistory",
+      "2016",
+      "2016",
+      "WindowsPlayer"
+    ],
+    "1281682475231350877": [
+      ">randomdeployhistory",
+      "2016",
+      "2016",
+      "WindowsPlayer"
+    ],
+    "1281691872250560562": {
+      "id": "883088903052091442",
+      "name": "windows75659"
+    }
+  }
+}

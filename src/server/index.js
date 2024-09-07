@@ -184,43 +184,6 @@ console.error = function(d) { //
   log_stdout.write(util.format("[ERROR] %s",d) + '\n');
 };
 
-//TempMessageDB (workaround for embeds)
-let embdb = {};
-
-function getDataForMessageId(id) {
-  setTimeout(1000, () => { embdb[id] = undefined; });
-  return embdb[id];
-}
-
-function addDataForMessageId(id, dat) {
-  embdb[id] = dat;
-}
-
-//JSON Database Logging
-let db = {};
-
-addToWatchList("db", db);
-//var dbFile = fs.createWriteStream("./db.json", {flags : 'w'});
-console.log("Opening database file..");
-try {
-db = JSON.parse(fs.readFileSync("../data/base/db.json"));
-onVarChange("db", db);
-} catch (eee) {
-db = {};
-console.error(eee);
-}
-console.log("Done!");
-
-function reloadDb() {
-  try {
-    db = JSON.parse(fs.readFileSync("../data/base/db.json"));
-    onVarChange("db", db);
-    } catch (eee) {
-    db = {};
-    console.error(eee);
-    }
-}
-
 let stateDb = {};
 console.log("Opening StateDatabase file..");
 try {
@@ -246,6 +209,53 @@ return stateDb[name];
 function stateSet(name, val) {
 stateDb[name] = val;
 stateSave();
+}
+
+//TempMessageDB (workaround for embeds)
+let embdb = {};
+
+try {
+embdb = stateGet("embdb");
+if(!embdb) {
+embdb = {};
+}
+} catch(e) {
+embdb = {};
+}
+
+function getDataForMessageId(id) {
+  setTimeout(1000, () => { embdb[id] = undefined; stateSet("embdb", embdb); });
+  return stateGet("embdb")[id];
+}
+
+function addDataForMessageId(id, dat) {
+  embdb[id] = dat;
+  stateSet("embdb", embdb);
+}
+
+//JSON Database Logging
+let db = {};
+
+addToWatchList("db", db);
+//var dbFile = fs.createWriteStream("./db.json", {flags : 'w'});
+console.log("Opening database file..");
+try {
+db = JSON.parse(fs.readFileSync("../data/base/db.json"));
+onVarChange("db", db);
+} catch (eee) {
+db = {};
+console.error(eee);
+}
+console.log("Done!");
+
+function reloadDb() {
+  try {
+    db = JSON.parse(fs.readFileSync("../data/base/db.json"));
+    onVarChange("db", db);
+    } catch (eee) {
+    db = {};
+    console.error(eee);
+    }
 }
 
 let badgeDb = {};
@@ -687,30 +697,11 @@ console.log("Starting..."); //start the loading process
 let pingCmd = new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Replies with pong')
-        .setIntegrationType([0])
-        .setContext([0]);
-
-let callCmd = new SlashCommandBuilder()
-        .setName('call')
-        .setDescription('Call by name if command no work it might be my wifi or bot ded')
-        .addStringOption(new SlashCommandStringOption()
-            .setName('name')
-            .setDescription('Command name')
-            .setRequired(true))
-        .addStringOption(new SlashCommandStringOption()
-            .setName('args')
-            .setDescription('Command arguments (split with space)'))
-        .setIntegrationType([0])
-        .setContext([0]);
-        
-let pingCmdDm = new SlashCommandBuilder()
-        .setName('ping2')
-        .setDescription('Replies with pong')
         .setIntegrationType([1])
         .setContext([2]);
 
-let callCmdDm = new SlashCommandBuilder()
-        .setName('call2')
+let callCmd = new SlashCommandBuilder()
+        .setName('call')
         .setDescription('Call by name if command no work it might be my wifi or bot ded')
         .addStringOption(new SlashCommandStringOption()
             .setName('name')
@@ -732,10 +723,6 @@ client.commandList.set('ping', pingCmd);
 
 client.commandList.set("call", callCmd);
 
-client.commandList.set('pingDm', pingCmdDm);
-
-client.commandList.set("callDm", callCmdDm);
-
 client.commandList.set("help", helpCmd);
 
 client.commandList.set("purge", new SlashCommandBuilder()
@@ -745,19 +732,13 @@ client.commandList.set("purge", new SlashCommandBuilder()
             .setName('limit')
             .setDescription('How many messages')
             .setRequired(true))
-        .setIntegrationType([0])
-        .setContext([0]));
+        .setIntegrationType([1])
+        .setContext([2]));
 client.commandList.set("inviteLink", new SlashCommandBuilder()
         .setName("invitelink")
         .setDescription("Invite link (technically self promo)")
         .setIntegrationType([1])
         .setContext([2]));
-        
-client.commandList.set("inviteLinkV2", new SlashCommandBuilder()
-        .setName("invitelink2")
-        .setDescription("Invite link (technically self promo)")
-        .setIntegrationType([0])
-        .setContext([0]));
 
 let testignInfo = new FWButtonInfo()
         .setIsOwnerOnly(true)
@@ -768,14 +749,20 @@ let viewbadInfo = new FWButtonInfo()
         .setId("viewbadge");
 
 let ballrollThing = new FWButtonInfo()
-        .setIsOwnerOnly(true)
+        .setIsOwnerOnly(false)
         .setId("ballroll");
+
+let deployroll = new FWButtonInfo()
+        .setIsOwnerOnly(false)
+        .setId("deployroll");
 
 client.buttonCommandInfo.set("testign", testignInfo);
 
 client.buttonCommandInfo.set("viewbadge", viewbadInfo);
 
 client.buttonCommandInfo.set("ballroll", ballrollThing);
+
+client.buttonCommandInfo.set("deployroll", deployroll);
 
 onVarChange("client.commandList", client.commandList);
 
@@ -796,7 +783,8 @@ client.commands.set("ping", async (interaction) => {
 
 client.commands.set("call", async (interaction) => {
     if(!permissionCheck(interaction, true, "SEND_MESSAGES")) { await interaction.reply({ content:"I cannot send messages in here!", ephemeral: true }); return; }
-    console.log("Processing request");
+	let usernami = interaction.member?.username ?? interaction.user.username;
+    console.log("Processing request from "+usernami);
     await interaction.deferReply();
     let msg = {};
     Reflect.set(msg, "author", interaction.member ?? interaction.user);
@@ -861,15 +849,12 @@ client.commands.set("invitelink", async (interaction) => {
     await interaction.reply({ content: "You can add or invite me [here](https://discord.com/oauth2/authorize?client_id=1128020016441327779)" });
 });
 
-client.commands.set("ping2", client.commands.get("ping"));
-
-client.commands.set("call2", client.commands.get("call"));
-
-client.commands.set("invitelink2", client.commands.get("invitelink"));
-
 client.buttonCommands.set("ballroll", async (interaction) => {
   let lineas = fs.readFileSync("../data/assets/8ball.txt").toString().split("\n");
     let linerand = lineas[getRandomInt(lineas.length + 1)];
+	if(!linerand) {
+	  linerand = "No way in hell";
+	}
     let holyhsit = new MessageEmbed()
             .setTitle("The balls says...")
             .setDescription(linerand);
@@ -881,6 +866,103 @@ client.buttonCommands.set("ballroll", async (interaction) => {
                     .setCustomId('ballroll') 
             );
   await interaction.update({ embeds:[holyhsit], components:[row] });
+});
+
+client.buttonCommands.set("deployroll", async (interaction) => {
+  let msgg = getDataForMessageId(interaction.message?.id);
+  if (msgg[0] == ">randomdeployhistory") {
+    let infol = "";
+    let thiang = testParsed.filter(item => {
+      if(Number.parseInt(msgg[1])) {
+        infol = "1 is valid int (parseint)";
+        if(msgg[2]) {
+          infol = "1 is valid int, 2 is valid";
+          let yeart = Number.parseInt(msgg[2]);
+          if(yeart) {
+            infol = "1 is valid int, 2 is valid int";
+            if(msgg[3]) {
+              if(yeart >= 2009) { //wheat
+        infol = "1 is valid int, 2 is valid int and year, 3 is type";
+                if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                  return true;
+                }
+              } else { //version
+        infol = "1 is valid int, 2 is valid int";
+                if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                  return true;
+                }
+              }
+            } else {
+              
+              if(yeart >= 2009) { //wheat
+    infol = "1 is valid int, 2 is valid int and year";
+                if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2])) {
+                  return true;
+                }
+              } else { //version
+    infol = "1 is valid int, 2 is valid int";
+                if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+                  return true;
+                }
+              }
+            }
+          } else {
+            infol = "1 is valid int, 2 is type";
+            if(yeart >= 2009) { //wheat
+      infol = "1 is valid int and year, 2 is type";
+            if(item.vyear == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          } else { //version
+            if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          }
+          }
+        } else {
+          let yeart = Number.parseInt(msgg[1]);
+          if(yeart) {
+    infol = "1 is valid int (msgg 2 else)";
+          if(yeart >= 2009) { //wheat
+            if(item.vyear == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          } else { //version
+            if(item.vvernum == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          }
+          }
+        }
+      } else if(msgg[1]) {
+  infol = "1 is type (else)";
+        if(item.vtype == msgg[1]) {
+          return true;
+        }
+}
+if(msgg[1] == undefined || msgg[1] == null) { return true; }
+      return false;
+    });
+    const row = new MessageActionRow()
+          .addComponents(
+              new MessageButton()
+                  .setLabel('Re-roll')
+                  .setStyle('PRIMARY')
+                  .setCustomId('deployroll') 
+          );
+    let shitlb = thiang[getRandomInt(thiang.length + 1)];
+	for(let lbg = 0; lbg < 500; lbg++) {
+	  if(!shitlb) {
+		  shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  }
+	  }
+    addDataForMessageId(interaction.message.id, msgg);
+    if(shitlb) {
+      interaction.update({ content: "```"+infol+"\n"+shitlb.vorig+"```", components:[row] });
+    } else {
+      interaction.update({ content: "```"+infol+"\nNo version found.```", components:[row] });
+    }
+  }
 });
 
 client.buttonCommands.set("testign", async (interaction) => {
@@ -1022,8 +1104,42 @@ function makeid(length) { //random string gen
 }
 
 //random int (max needs to be max + 1 for accurate values)
+function splitmix32(a) {
+ return function() {
+	 a |= 0;
+   a = a + 0x9e3779b9 | 0;
+   let t = a ^ a >>> 16;
+   t = Math.imul(t, 0x21f0aaad);
+   t = t ^ t >>> 15;
+   t = Math.imul(t, 0x735a2d97);
+   return ((t = t ^ t >>> 15) >>> 0) / 4294967296;
+  }
+}
+
+function sfc32(a, b, c, d) {
+  return function() {
+    a |= 0; b |= 0; c |= 0; d |= 0;
+    let ttt = (a + b | 0) + d | 0;
+    d = d + 1 | 0;
+    a = b ^ b >>> 9;
+    b = c + (c << 3) | 0;
+    c = (c << 21 | c >>> 11);
+    c = c + ttt | 0;
+	a = a + 0x9e3779b9 | 0;
+	let t = ttt ^ a >>> 16;
+	t = Math.imul(t, 0x21f0aaad);
+	t = t ^ t >>> 15;
+	t = Math.imul(t, 0x735a2d97);
+    return (t >>> 0) / 4294967296;
+  }
+}
+
+const seedgen = () => (Math.random()*2**32)>>>0;
+let getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
+
 function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
+  getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
+  return Math.floor(getRand() * max);
 }
 
 //clearup
@@ -1705,15 +1821,29 @@ cmd.render = async function(msgg, message) {
             return true;
           }
 	}
-	if(msgg[1] == undefined || msgg[1] == null) { return true; }
+	if(msgg[1] == undefined || msgg[1] == null || msgg[1] == "noargs") { return true; }
         return false;
       });
+      const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setLabel('Re-roll')
+                    .setStyle('PRIMARY')
+                    .setCustomId('deployroll') 
+            );
       let shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  for(let lbg = 0; lbg < 500; lbg++) {
+	  if(!shitlb) {
+		  shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  }
+	  }
+      let messagery = null;
       if(shitlb) {
-        message.reply({ content: "```"+infol+"\n"+shitlb.vorig+"```" });
+        messagery = await message.reply({ content: "```"+infol+"\n"+shitlb.vorig+"```", components:[row] });
       } else {
-        message.reply({ content: "```"+infol+"\nNo version found.```" });
+        messagery = await message.reply({ content: "```"+infol+"\nNo version found.```", components:[row] });
       }
+      addDataForMessageId(messagery.id, msgg);
     }
   }
   
@@ -2275,6 +2405,9 @@ cmd.render = async function(msgg, message) {
   cmd.ball = async function(msgg, message) {
     let lineas = fs.readFileSync("../data/assets/8ball.txt").toString().split("\n");
     let linerand = lineas[getRandomInt(lineas.length + 1)];
+	if(!linerand) {
+	  linerand = "No way in hell";
+	}
     let holyhsit = new MessageEmbed()
             .setTitle("The balls says...")
             .setDescription(linerand);
@@ -2378,6 +2511,33 @@ client.on('interactionCreate', async (interaction) => {
 	console.log(interaction)
   }
 	if (interaction.isCommand()) {
+	try {
+  if (commandBlacklist[interaction.guild.id]) {
+        if (commandBlacklist[interaction.guild.id][interaction.options.getString("name")]) {
+            interaction.reply({ content:"sorry but this command has been disabled serverwide" });
+            console.log("closest");
+            return;
+        }
+        console.log("close");
+    }
+    if (commandBlacklistV2[interaction.channel.id]) {
+        if (commandBlacklistV2[interaction.channel.id][interaction.options.getString("name")]) {
+            interaction.reply({ content:"this channel cannot use that command" });
+            console.log("closest");
+            return;
+        }
+        console.log("close");
+    }
+	let origame = interaction.member?.user.id ?? interaction.user.id;
+    if (commandBlacklistV3[origame]) {
+        if (commandBlacklistV3[origame][interaction.options.getString("name")]) {
+            interaction.reply({ content:"u cannot use that command" });
+            console.log("closest");
+            return;
+        }
+        console.log("close");
+    }
+  } catch(e) { }
     if(globalSettings.awardBadgeOnReceive) {
       easyAwardBadgeInteract(interaction, globalSettings.awardBadgeId);
     }
@@ -2503,7 +2663,7 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
         }
         console.log("close");
     }
-  } catch(e) { console.error(e); }
+  } catch(e) { }
 
   if (msgg[0].startsWith(">") && cmd[msgg[0].split(">")[1]]) {
     if (message.channel.type == 'DM') {
