@@ -233,6 +233,45 @@ function addDataForMessageId(id, dat) {
   stateSet("embdb", embdb);
 }
 
+//random int (max needs to be max + 1 for accurate values)
+function splitmix32(a) {
+return function() {
+ a |= 0;
+ a = a + 0x9e3779b9 | 0;
+ let t = a ^ a >>> 16;
+ t = Math.imul(t, 0x21f0aaad);
+ t = t ^ t >>> 15;
+ t = Math.imul(t, 0x735a2d97);
+ return ((t = t ^ t >>> 15) >>> 0) / 4294967296;
+}
+}
+
+function sfc32(a, b, c, d) {
+return function() {
+  a |= 0; b |= 0; c |= 0; d |= 0;
+  let ttt = (a + b | 0) + d | 0;
+  d = d + 1 | 0;
+  a = b ^ b >>> 9;
+  b = c + (c << 3) | 0;
+  c = (c << 21 | c >>> 11);
+  c = c + ttt | 0;
+a = a + 0x9e3779b9 | 0;
+let t = ttt ^ a >>> 16;
+t = Math.imul(t, 0x21f0aaad);
+t = t ^ t >>> 15;
+t = Math.imul(t, 0x735a2d97);
+  return (t >>> 0) / 4294967296;
+}
+}
+
+const seedgen = () => (Math.random()*2**32)>>>0;
+let getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
+
+function getRandomInt(max) {
+getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
+return Math.floor(getRand() * max);
+}
+
 //JSON Database Logging
 let db = {};
 
@@ -457,6 +496,20 @@ let radnom = radnom1.filter(item => {
       let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
       testParsed.push(slobj);
     }
+    if(splitla.length == 14) { //no git hash, file ver
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testParsed.push(slobj);
+    }
+    if(splitla.length == 17) { //no git hash, file ver
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testParsed.push(slobj);
+    }
   }
   return isValid == false ? false : true;
 });
@@ -491,6 +544,7 @@ let cmds = [];
 
 import { EventEmitter } from 'node:events';
 import { setTimeout, setInterval } from 'timers/promises';
+import { decode } from 'punycode';
 class ClientEmitter extends EventEmitter {}
 const emitting = new ClientEmitter();
 
@@ -749,7 +803,7 @@ let viewbadInfo = new FWButtonInfo()
         .setId("viewbadge");
 
 let ballrollThing = new FWButtonInfo()
-        .setIsOwnerOnly(false)
+        .setIsOwnerOnly(true)
         .setId("ballroll");
 
 let deployroll = new FWButtonInfo()
@@ -1089,57 +1143,6 @@ function wait5(waitTime) {
     }, waitTime);
   });
   
-}
-
-function makeid(length) { //random string gen
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$_&-+()/*?"!\';:~`|•√π÷×§∆£\¢}€{¥=^°%]©[®✓™';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-}
-
-//random int (max needs to be max + 1 for accurate values)
-function splitmix32(a) {
- return function() {
-	 a |= 0;
-   a = a + 0x9e3779b9 | 0;
-   let t = a ^ a >>> 16;
-   t = Math.imul(t, 0x21f0aaad);
-   t = t ^ t >>> 15;
-   t = Math.imul(t, 0x735a2d97);
-   return ((t = t ^ t >>> 15) >>> 0) / 4294967296;
-  }
-}
-
-function sfc32(a, b, c, d) {
-  return function() {
-    a |= 0; b |= 0; c |= 0; d |= 0;
-    let ttt = (a + b | 0) + d | 0;
-    d = d + 1 | 0;
-    a = b ^ b >>> 9;
-    b = c + (c << 3) | 0;
-    c = (c << 21 | c >>> 11);
-    c = c + ttt | 0;
-	a = a + 0x9e3779b9 | 0;
-	let t = ttt ^ a >>> 16;
-	t = Math.imul(t, 0x21f0aaad);
-	t = t ^ t >>> 15;
-	t = Math.imul(t, 0x735a2d97);
-    return (t >>> 0) / 4294967296;
-  }
-}
-
-const seedgen = () => (Math.random()*2**32)>>>0;
-let getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
-
-function getRandomInt(max) {
-  getRand = sfc32(seedgen(), seedgen(), seedgen(), seedgen());
-  return Math.floor(getRand() * max);
 }
 
 //clearup
@@ -2389,7 +2392,7 @@ cmd.render = async function(msgg, message) {
       for(let i = 0; i < thiang.length; i++) {
         let thling = thiang[i];
         if(i < 25) {
-          holyhsit.addField("Entry #"+(i+1), "Version: "+thling.vvernum+" build "+thling.vvernumbuild, true);
+          holyhsit.addField("Entry #"+(i+1), "Version: "+thling.vvernum+" build "+thling.vvernumbuild+", "+new Date(thling.vdate).toISOString().substring(0, 10), true);
         } else {
           if(!warn) {
             warn = true;

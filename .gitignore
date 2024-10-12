@@ -131,9 +131,9 @@ dist
 
 #Flawless
 data/config/main.json
+data/base/db.json
+data/base/state.json
 data/data/badges/*
 data/downloads/*
 data/logs/*
-data/base/db.json
-data/base/state.json
 node_modules.rar
