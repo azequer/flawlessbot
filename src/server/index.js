@@ -233,6 +233,20 @@ function addDataForMessageId(id, dat) {
   stateSet("embdb", embdb);
 }
 
+class FWUser {
+	id = "0";
+	data = {};
+	badges = [];
+	
+	constructor(id) {
+		
+	}
+	
+	load() {
+		
+	}
+}
+
 //random int (max needs to be max + 1 for accurate values)
 function splitmix32(a) {
 return function() {
@@ -472,9 +486,15 @@ console.log("Loading deploy history..");
 
 let testParsed = [];
 
+let testSucksParsed = [];
+
 let test = await axios.get("https://setup.rbxcdn.com/DeployHistory.txt");
      
 let radnom1 = test.data.split('\n');
+
+let testThisSucks = await axios.get("https://s3.amazonaws.com/setup.gametest2.robloxlabs.com/DeployHistory.txt");
+     
+let testThisSucks1 = testThisSucks.data.split('\n');
 
 let radnom = radnom1.filter(item => {
   let isValid = item.includes("New");
@@ -509,6 +529,44 @@ let radnom = radnom1.filter(item => {
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
       let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
       testParsed.push(slobj);
+    }
+  }
+  return isValid == false ? false : true;
+});
+
+let radnomIHateThis = testThisSucks1.filter(item => {
+  let isValid = item.includes("New");
+  //New RccService version-336605f55f6847b4 at 11/10/2009 3:35:29 PM... Done!
+  //New RccService version-978fdda2ac634c5b at 4/6/2011 11:21:51 PM, file verion: 0, 37, 0, 13...Done!
+  if(isValid) {
+    let splitla = item.split(" ");
+    if(splitla.length == 8) { //no git hash
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yearballs };
+      testSucksParsed.push(slobj);
+    }
+    if(splitla.length == 13) { //no git hash, file ver
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testSucksParsed.push(slobj);
+    }
+    if(splitla.length == 14) { //no git hash, file ver
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testSucksParsed.push(slobj);
+    }
+    if(splitla.length == 17) { //no git hash, file ver
+      let yearll = splitla[4].split("/");
+      let yearballs = Number.parseInt(yearll[2]);
+      let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      testSucksParsed.push(slobj);
     }
   }
   return isValid == false ? false : true;
@@ -810,6 +868,10 @@ let deployroll = new FWButtonInfo()
         .setIsOwnerOnly(false)
         .setId("deployroll");
 
+let deploygeeroll = new FWButtonInfo()
+        .setIsOwnerOnly(false)
+        .setId("deploygroll");
+
 client.buttonCommandInfo.set("testign", testignInfo);
 
 client.buttonCommandInfo.set("viewbadge", viewbadInfo);
@@ -817,6 +879,7 @@ client.buttonCommandInfo.set("viewbadge", viewbadInfo);
 client.buttonCommandInfo.set("ballroll", ballrollThing);
 
 client.buttonCommandInfo.set("deployroll", deployroll);
+client.buttonCommandInfo.set("deploygroll", deploygeeroll);
 
 onVarChange("client.commandList", client.commandList);
 
@@ -1003,6 +1066,103 @@ if(msgg[1] == undefined || msgg[1] == null) { return true; }
                   .setLabel('Re-roll')
                   .setStyle('PRIMARY')
                   .setCustomId('deployroll') 
+          );
+    let shitlb = thiang[getRandomInt(thiang.length + 1)];
+	for(let lbg = 0; lbg < 500; lbg++) {
+	  if(!shitlb) {
+		  shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  }
+	  }
+    addDataForMessageId(interaction.message.id, msgg);
+    if(shitlb) {
+      interaction.update({ content: "```"+infol+"\n"+shitlb.vorig+"```", components:[row] });
+    } else {
+      interaction.update({ content: "```"+infol+"\nNo version found.```", components:[row] });
+    }
+  }
+});
+
+client.buttonCommands.set("deploygroll", async (interaction) => {
+  let msgg = getDataForMessageId(interaction.message?.id);
+  if (msgg[0] == ">randomgametest2deployhistory") {
+    let infol = "";
+    let thiang = testSucksParsed.filter(item => {
+      if(Number.parseInt(msgg[1])) {
+        infol = "1 is valid int (parseint)";
+        if(msgg[2]) {
+          infol = "1 is valid int, 2 is valid";
+          let yeart = Number.parseInt(msgg[2]);
+          if(yeart) {
+            infol = "1 is valid int, 2 is valid int";
+            if(msgg[3]) {
+              if(yeart >= 2009) { //wheat
+        infol = "1 is valid int, 2 is valid int and year, 3 is type";
+                if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                  return true;
+                }
+              } else { //version
+        infol = "1 is valid int, 2 is valid int";
+                if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                  return true;
+                }
+              }
+            } else {
+              
+              if(yeart >= 2009) { //wheat
+    infol = "1 is valid int, 2 is valid int and year";
+                if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2])) {
+                  return true;
+                }
+              } else { //version
+    infol = "1 is valid int, 2 is valid int";
+                if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+                  return true;
+                }
+              }
+            }
+          } else {
+            infol = "1 is valid int, 2 is type";
+            if(yeart >= 2009) { //wheat
+      infol = "1 is valid int and year, 2 is type";
+            if(item.vyear == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          } else { //version
+            if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          }
+          }
+        } else {
+          let yeart = Number.parseInt(msgg[1]);
+          if(yeart) {
+    infol = "1 is valid int (msgg 2 else)";
+          if(yeart >= 2009) { //wheat
+            if(item.vyear == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          } else { //version
+            if(item.vvernum == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          }
+          }
+        }
+      } else if(msgg[1]) {
+  infol = "1 is type (else)";
+        if(item.vtype == msgg[1]) {
+          return true;
+        }
+}
+if(msgg[1] == undefined || msgg[1] == null) { return true; }
+      return false;
+    });
+    const row = new MessageActionRow()
+          .addComponents(
+              new MessageButton()
+                  .setLabel('Re-roll')
+                  .setStyle('PRIMARY')
+                  .setCustomId('deploygroll') 
           );
     let shitlb = thiang[getRandomInt(thiang.length + 1)];
 	for(let lbg = 0; lbg < 500; lbg++) {
@@ -1398,8 +1558,6 @@ cmd.render = async function(msgg, message) {
   }
   }
   
-  register("dicksucker", "");
-  
   cmd.ss = async function(msgg, message) {
   if (msgg[0] == ">ss") {
     if (!isAdmin(message.author.id, message)) {
@@ -1456,24 +1614,18 @@ cmd.render = async function(msgg, message) {
   
   cmd.gayrate = function(msgg, message) {
   if (msgg[0] == ">gayrate") {
-    if (Reflect.get(message, "isFromCall")) {
-      message.reply("Nuh uh");
-      return;
-    }
     const men = message.mentions.users.first();
     if (!men) {
     message.reply({ content: "You are "+getRandomInt(102)+"% gay.." });
     } else {
-    if (men.id !== "1114477659242647583" && men.id !== whoTheFuckOwnsThisBot && men.id !== "460496281358434304" && men.id !== "1152670980452401344") {
-    message.channel.send("<@"+men.id+"> is "+getRandomInt(201)+"% gay..");
+    if(men.id !== whoTheFuckOwnsThisBot) {
+    message.reply("<@"+men.id+"> is "+getRandomInt(201)+"% gay..");
     } else {
-    message.channel.send("<@"+men.id+"> is "+"145769770486703926669137700174181370409209110449761463904094252590409422379396593349305888394330706969186332956"+"% gay..");
+    message.reply({ content: "You suck." });
     }
     }
   }
   }
-  
-  register("gayrate", "");
   
   cmd.ship = async function(msgg, message) {
   if (msgg[0] == ">ship") {
@@ -1856,8 +2008,98 @@ cmd.render = async function(msgg, message) {
   
   cmd.randomgametest2deployhistory = async function(msgg, message) {
     if (msgg[0] == ">randomgametest2deployhistory") {
-      
-      message.reply({ content: "```"+radnomFuck[getRandomInt(radnomFuck.length + 1)]+"```" });
+      let infol = "";
+      let thiang = testSucksParsed.filter(item => {
+        if(Number.parseInt(msgg[1])) {
+          infol = "1 is valid int (parseint)";
+          if(msgg[2]) {
+            infol = "1 is valid int, 2 is valid";
+            let yeart = Number.parseInt(msgg[2]);
+            if(yeart) {
+              infol = "1 is valid int, 2 is valid int";
+              if(msgg[3]) {
+                if(yeart >= 2009) { //wheat
+				  infol = "1 is valid int, 2 is valid int and year, 3 is type";
+                  if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                    return true;
+                  }
+                } else { //version
+				  infol = "1 is valid int, 2 is valid int";
+                  if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+                    return true;
+                  }
+                }
+              } else {
+                
+                if(yeart >= 2009) { //wheat
+		  infol = "1 is valid int, 2 is valid int and year";
+                  if(item.vyear >= Number.parseInt(msgg[1]) && item.vyear <= Number.parseInt(msgg[2])) {
+                    return true;
+                  }
+                } else { //version
+		  infol = "1 is valid int, 2 is valid int";
+                  if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+                    return true;
+                  }
+                }
+              }
+            } else {
+              infol = "1 is valid int, 2 is type";
+              if(yeart >= 2009) { //wheat
+			  infol = "1 is valid int and year, 2 is type";
+              if(item.vyear == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+                return true;
+              }
+            } else { //version
+              if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+                return true;
+              }
+            }
+            }
+          } else {
+            let yeart = Number.parseInt(msgg[1]);
+            if(yeart) {
+	    infol = "1 is valid int (msgg 2 else)";
+            if(yeart >= 2009) { //wheat
+              if(item.vyear == Number.parseInt(msgg[1])) {
+                return true;
+              }
+            } else { //version
+              if(item.vvernum == Number.parseInt(msgg[1])) {
+                return true;
+              }
+            }
+            }
+          }
+        } else if(msgg[1]) {
+	  infol = "1 is type (else)";
+          if(item.vtype == msgg[1]) {
+            return true;
+          }
+	}
+	if(msgg[1] == undefined || msgg[1] == null || msgg[1] == "noargs") { return true; }
+        return false;
+      });
+      const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setLabel('Re-roll')
+                    .setStyle('PRIMARY')
+                    .setCustomId('deploygroll') 
+            );
+      let shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  for(let lbg = 0; lbg < 500; lbg++) {
+	  if(!shitlb) {
+		  shitlb = thiang[getRandomInt(thiang.length + 1)];
+	  }
+	  }
+      let messagery = null;
+      if(shitlb) {
+        messagery = await message.reply({ content: "```"+infol+"\n"+shitlb.vorig+"```", components:[row] });
+      } else {
+        messagery = await message.reply({ content: "```"+infol+"\nNo version found.```", components:[row] });
+      }
+      addDataForMessageId(messagery.id, msgg);
     }
   }
   
@@ -2405,6 +2647,51 @@ cmd.render = async function(msgg, message) {
     }
   }
 
+  cmd.getAllVersionsTest = async function(msgg, message) {
+    if(msgg[1] && Number.parseInt(msgg[1]) != NaN && Number.parseInt(msgg[1]) != null) {
+      let thiang = testSucksParsed.filter(item => {
+        if(msgg[2] && Number.parseInt(msgg[2]) != NaN && Number.parseInt(msgg[2]) != null) {
+          if(msgg[3]) {
+            if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2]) && item.vtype == msgg[3]) {
+              return true;
+            }
+          } else {
+            if(item.vvernum >= Number.parseInt(msgg[1]) && item.vvernum <= Number.parseInt(msgg[2])) {
+              return true;
+            }
+          }
+        } else {
+          if(msgg[2]) {
+            if(item.vvernum == Number.parseInt(msgg[1]) && item.vtype == msgg[2]) {
+              return true;
+            }
+          } else {
+            if(item.vvernum == Number.parseInt(msgg[1])) {
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+      let holyhsit = new MessageEmbed()
+      holyhsit.setTitle("VersionView");
+      let warn = false;
+      for(let i = 0; i < thiang.length; i++) {
+        let thling = thiang[i];
+        if(i < 25) {
+          holyhsit.addField("Entry #"+(i+1), "Version: "+thling.vvernum+" build "+thling.vvernumbuild+", "+new Date(thling.vdate).toISOString().substring(0, 10), true);
+        } else {
+          if(!warn) {
+            warn = true;
+            holyhsit.setDescription("Warning: more than 25 entries; displaying only 1-25 entries");
+          }
+        }
+      }
+      holyhsit.setFooter("Showing "+thiang.length+" out of "+testSucksParsed.length+" versions.");
+      message.reply({ embeds:[holyhsit] });
+    }
+  }
+
   cmd.ball = async function(msgg, message) {
     let lineas = fs.readFileSync("../data/assets/8ball.txt").toString().split("\n");
     let linerand = lineas[getRandomInt(lineas.length + 1)];
@@ -2559,7 +2846,7 @@ client.on('interactionCreate', async (interaction) => {
     if (client.buttonCommands.has(buttonName) && client.buttonCommandInfo.has(buttonName)) {
       try {
       let btnInfo = client.buttonCommandInfo.get(buttonName);
-      let origame = interaction.message.interaction.member?.user.id ?? interaction.message.interaction.user.id;
+      let origame = interaction.message.interaction?.member?.user.id ?? interaction.message.interaction?.user.id;
       let athor = interaction.member?.user.id ?? interaction.user.id;
       if(globalSettings.debugPrintsEnabled) {
       console.log(btnInfo);
@@ -2567,7 +2854,7 @@ client.on('interactionCreate', async (interaction) => {
       console.log("original uid: "+origame+", author uid: "+athor);
       }
       if (btnInfo.isOwnerOnly) {
-        if (origame != athor) {
+        if (origame != athor && origame != null && origame != undefined) {
           await interaction.reply({ content:"This is NOT your interaction...", ephemeral: true });
           return;
         }

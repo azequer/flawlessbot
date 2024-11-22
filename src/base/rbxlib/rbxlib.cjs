@@ -1601,17 +1601,18 @@ function newToText(str) {
 		willHaveTexture = false;
 	}
 	let scale = (ver == "1.00") ? 2 : 1;
-	outp1.push((vx * scale).toFixed(5));
-	outp1.push((vy * scale).toFixed(5));
-	outp1.push((vz * scale).toFixed(5));
+	let ver10inv = (ver == "1.00") ? 1.0 : 0.0;
+	outp1.push((vx * scale));
+	outp1.push((vy * scale));
+	outp1.push((vz * scale));
 	let outp1str = "["+outp1.join(",")+"]";
-	outp2.push(nx.toFixed(5));
-	outp2.push(ny.toFixed(5));
-	outp2.push(nz.toFixed(5));
+	outp2.push(nx);
+	outp2.push(ny);
+	outp2.push(nz);
 	let outp2str = "["+outp2.join(",")+"]";
 	if(willHaveTexture) {
-	outp3.push(tx.toFixed(5));
-	outp3.push((1.0 - ty).toFixed(5));
+	outp3.push(tx);
+	outp3.push((ver10inv - ty));
 	} else {
 	outp3.push("0");
 	outp3.push("0");
