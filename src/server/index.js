@@ -62,9 +62,6 @@ axios.defaults.timeout = 120000;
 const app = express();
 const port = 9853;
 const wsport = 9854;
-
-let processedMessages = 0;
-let processedAppCommands = 0;
 let startTime = Date.now()/1000;
 
 //variables!!
@@ -210,6 +207,44 @@ function stateSet(name, val) {
 stateDb[name] = val;
 stateSave();
 }
+
+//Statistics ;3
+let statistics = {};
+
+try {
+statistics = stateGet("stat");
+if(!statistics) {
+statistics = {};
+}
+} catch(e) {
+statistics = {};
+}
+
+let stat = {
+  incrementCounter: function(id, extradata = null){
+    let thing = statistics[id];
+    if(thing == undefined && thing == null) {
+      thing = {};
+      thing["data"] = [];
+      thing["amount"] = 0;
+    }
+    thing["amount"]++;
+    if(extradata != null) {
+      let newdata = {
+        "count": thing["amount"],
+        "data": extradata
+      };
+      thing["data"].push(newdata);
+    }
+  },
+  reportStat: function(id, data = null) {
+    let thing = statistics[id];
+    if(thing == undefined && thing == null) {
+      thing = [];
+    }
+    thing.push(data);
+  }
+};
 
 //TempMessageDB (workaround for embeds)
 let embdb = {};
@@ -504,30 +539,30 @@ let radnom = radnom1.filter(item => {
     let splitla = item.split(" ");
     if(splitla.length == 8) { //no git hash
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yeartwothing };
       testParsed.push(slobj);
     }
     if(splitla.length == 13) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testParsed.push(slobj);
     }
     if(splitla.length == 14) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testParsed.push(slobj);
     }
     if(splitla.length == 17) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testParsed.push(slobj);
     }
   }
@@ -542,30 +577,30 @@ let radnomIHateThis = testThisSucks1.filter(item => {
     let splitla = item.split(" ");
     if(splitla.length == 8) { //no git hash
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": 0, "vvernumbuild": 0, "vorig": item, "vyear": yeartwothing };
       testSucksParsed.push(slobj);
     }
     if(splitla.length == 13) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testSucksParsed.push(slobj);
     }
     if(splitla.length == 14) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testSucksParsed.push(slobj);
     }
     if(splitla.length == 17) { //no git hash, file ver
       let yearll = splitla[4].split("/");
-      let yearballs = Number.parseInt(yearll[2]);
+      let yeartwothing = Number.parseInt(yearll[2]);
       let datet = Date.parse(splitla[4]+" "+splitla[5]+" "+splitla[6]);
-      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yearballs };
+      let slobj = { "vhash": splitla[2], "vtype": splitla[1], "vdate": datet, "vvernum": Number.parseInt(splitla[13-3]), "vvernumbuild": Number.parseInt(splitla[13-1]), "vorig": item, "vyear": yeartwothing };
       testSucksParsed.push(slobj);
     }
   }
@@ -809,8 +844,8 @@ console.log("Starting..."); //start the loading process
 let pingCmd = new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Replies with pong')
-        .setIntegrationType([1])
-        .setContext([2]);
+        .setIntegrationType([0,1])
+        .setContext([0,2]);
 
 let callCmd = new SlashCommandBuilder()
         .setName('call')
@@ -822,14 +857,14 @@ let callCmd = new SlashCommandBuilder()
         .addStringOption(new SlashCommandStringOption()
             .setName('args')
             .setDescription('Command arguments (split with space)'))
-        .setIntegrationType([1])
-        .setContext([2]);
+        .setIntegrationType([0,1])
+        .setContext([0,2]);
         
 let helpCmd = new SlashCommandBuilder()
         .setName('help')
         .setDescription('Help')
-        .setIntegrationType([1])
-        .setContext([2]);
+        .setIntegrationType([0,1])
+        .setContext([0,2]);
         
 client.commandList.set('ping', pingCmd);
 
@@ -844,13 +879,13 @@ client.commandList.set("purge", new SlashCommandBuilder()
             .setName('limit')
             .setDescription('How many messages')
             .setRequired(true))
-        .setIntegrationType([1])
-        .setContext([2]));
+        .setIntegrationType([0])
+        .setContext([0]));
 client.commandList.set("inviteLink", new SlashCommandBuilder()
         .setName("invitelink")
         .setDescription("Invite link (technically self promo)")
-        .setIntegrationType([1])
-        .setContext([2]));
+        .setIntegrationType([0])
+        .setContext([0]));
 
 let testignInfo = new FWButtonInfo()
         .setIsOwnerOnly(true)
@@ -1254,12 +1289,6 @@ async function mehssagev3(ied,msg,msgid) {
   return msgr.reply(msg);
 }
 
-async function no() {
-let guild = await client.guilds.cache.get('1131880428249305108');
-let meh = await guild.members.fetch('1024228169395482675');
-meh.timeout(null);
-}
-
 async function excpetionHandler(err, command, msgg) {
 if(globalSettings.reportExceptions) {
 mehssage("I caught a exception.\nException name: ``"+err.name+"``\nException message: ``"+err.message+"``\nStack trace: \n```txt\n"+err.stack+"```\nCommand: ``"+command+"``\nArguments: ``"+JSON.stringify(msgg,null,1)+"``\n\nHave fun debugging 1000+ lines of code");
@@ -1379,10 +1408,10 @@ cmd.render = async function(msgg, message) {
   if (msgg[0] === ">render") {
     try {
     let abortController = new AbortController()
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(120000, () => {
         abortController.abort()
         console.log("Aborted")
-    }, 120000)
+    })
     
     let res1 = await axios.post("https://users.roblox.com/v1/usernames/users", {
   "usernames": [
@@ -1399,15 +1428,15 @@ cmd.render = async function(msgg, message) {
     console.log(userId);
     
     let abortCuontroller = new AbortController()
-    const timeeout = setTimeout(() => {
+    const timeeout = setTimeout(120000, () => {
         abortCuontroller.abort()
         console.log("Aborted")
-    }, 120000)
+    })
     
     let res2 = await axios.get("https://thumbnails.roblox.com/v1/users/avatar?userIds="+userId+"&size=720x720&format=Png&isCircular=false", { signal: abortController.signal, timeout: 120000 });
     clearTimeout(timeeout);
     
-    const shoturl = res2.data.data[0].imageUrl;
+    const shoturl = res2.data.data[0].imageUrl.replaceAll("720", "1024");
     
     let mesvsage = new DiscordJS.MessageAttachment(shoturl,"ERRORIMAGE.png");
 
@@ -1416,11 +1445,7 @@ cmd.render = async function(msgg, message) {
                 new MessageButton()
                     .setLabel('View user')
                     .setStyle('LINK')
-                    .setURL("https://www.roblox.com/users/ID/profile".replaceAll("ID", userId)),
-                    new MessageButton()
-                    .setLabel('Test')
-                    .setStyle('PRIMARY')
-                    .setCustomId('testign')
+                    .setURL("https://www.roblox.com/users/ID/profile".replaceAll("ID", userId))
             );
 
     await message.reply({
@@ -1488,75 +1513,6 @@ cmd.render = async function(msgg, message) {
       }
     }
   }
-
-  register("sendExamplePlugin", "Sends example plugin.");
-
-  cmd.renderLimbo = async function(msgg, message) {
-  if (msgg[0] === ">renderLimbo") {
-    if (!isAdmin(message.author.id, message)) {
-      message.reply("You don't have permission to do that.");
-      return;
-    }
-    try {
-    let abortController = new AbortController()
-    const timeout = setTimeout(() => {
-        abortController.abort()
-        console.log("Aborted")
-    }, 120000)
-    
-    let res1 = await axios.get("https://api."+globalSettings.nonRobloxBaseUrl+"/users/get-by-username?username="+msgg[1], { signal: abortController.signal, timeout: 120000 });
-    clearTimeout(timeout);
-    if (!res1.data.Id) {
-    throw Error("User does not exist! 😠");
-    }
-    const userId = res1.data.Id;
-    
-    console.log(userId);
-    
-    const shoturl = "https://"+globalSettings.nonRobloxBaseUrl+"/Thumbs/Avatar.ashx?userId="+userId;
-
-    let mesvsage = new DiscordJS.MessageAttachment(shoturl,"ERRORIMAGE.png");
-
-    await message.reply({
-      files: [mesvsage] //can attach multiple files, simply add more commma delimited filepaths
-    });
-    } catch (idk) {
-      message.reply("Something went wrong.. 😥\n\n```"+idk.name+": "+idk.message+"```");
-      console.log(idk);
-    }
-  }
-  }
-  
-  register("renderLimbo", "Renders a Limbo avatar. (thx wumbo for fixing apis)");
-  
-  cmd.dicksucker = async function(msgg, message) {
-  if (msgg[0] == ">dicksucker") {
-    if (Reflect.get(message, "isFromCall")) {
-      message.reply("Nuh uh");
-      return;
-    }
-    if (!isAdmin(message.author.id, message)) {
-      message.reply("You don't have permission to do that.");
-      return;
-    }
-    let role = message.member.guild.roles.cache.find(role => role.name === "dicksucker :3");
-    const ment = message.mentions.users.first();
-    if (!ment) {
-      message.reply({content: "wtf.. no mention?"});
-      return;
-    }
-    if (role) {
-        try {
-        await message.guild.members.cache.get(ment.id).roles.add(role);
-        await message.channel.send("<@"+ment.id+"> is a dicksucker!");
-        } catch (what) {
-        message.reply("Couldn't add role😥");
-        }
-    } else {
-        throw new Error("thwre was no role 😢");
-    }
-  }
-  }
   
   cmd.ss = async function(msgg, message) {
   if (msgg[0] == ">ss") {
@@ -1611,46 +1567,6 @@ cmd.render = async function(msgg, message) {
     message.channel.send("done :3");
   }
   }
-  
-  cmd.gayrate = function(msgg, message) {
-  if (msgg[0] == ">gayrate") {
-    const men = message.mentions.users.first();
-    if (!men) {
-    message.reply({ content: "You are "+getRandomInt(102)+"% gay.." });
-    } else {
-    if(men.id !== whoTheFuckOwnsThisBot) {
-    message.reply("<@"+men.id+"> is "+getRandomInt(201)+"% gay..");
-    } else {
-    message.reply({ content: "You suck." });
-    }
-    }
-  }
-  }
-  
-  cmd.ship = async function(msgg, message) {
-  if (msgg[0] == ">ship") {
-    if (Reflect.get(message, "isFromCall")) {
-      message.reply("Nuh uh");
-      return;
-    }
-    //await message.guild.members.fetch();  
-    let test = message.guild.members.cache.random();
-    while (test === message.me) {
-    test = message.guild.members.cache.random();
-    }
-    const men = message.mentions.users.first();
-    if (!men) {
-      message.channel.send("I'm shipping <@"+message.author.id+"> with <@"+test.id+">.");
-    } else {
-      while (test === men) {
-      test = message.guild.members.cache.random();
-      }
-      message.channel.send("I'm shipping <@"+men.id+"> with <@"+test.id+">.");
-    }
-  }
-  }
-  
-  register("ship", "Ships two guild members.");
   
   cmd.playsmth = function(msgg, message) {
   if (msgg[0] == ">playsmth") {
@@ -1889,10 +1805,6 @@ cmd.render = async function(msgg, message) {
   
   cmd.bing = async function(msgg, message) {
     if (msgg[0] == ">bing") {
-      if (!isAdmin(message.author.id, message)) {
-        message.reply("You don't have permission to do that.");
-        return;
-      }
       const shoturl = "https://th.bing.com/th?q="+message.content.split(/\s(.*)/s)[1];
 
       let mesvsage = new DiscordJS.MessageAttachment(shoturl,"SPOILER_ERRORIMAGE.png");
@@ -2511,47 +2423,6 @@ cmd.render = async function(msgg, message) {
       message.reply({ content:"```txt\ntypeof: "+typeof(getFromWatchList(msgg[1]))+"\nJSON.stringify: \n"+aaa+"```" });
       }
   }
-  
-  cmd.renderRewinder = async function(msgg, message) {
-    //https://rewinder.fun/renders/user/user here
-  }
-
-  cmd.testEmbed = async function(msgg, message) {
-    let holyhsit = new MessageEmbed()
-            .setTitle("Testing")
-            .setDescription("Hi there")
-            .addField("Info #1", "Koutch is stupid", true)
-            .addField("Info #2", "Aze is stupid", true)
-            .addField("Info #3", "UTels is toast", true)
-            .addField("Info #4", "KoutchTheOG is stupid", true)
-            .addField("Info #5", ".atest is stupid", true)
-            .addField("Info #6", "Nora is trans", true)
-            .setFooter("This is SO cooll!!")
-            .setImage("")
-            .setThumbnail("https://cdn.discordapp.com/attachments/1259610012456845415/1271957921944703126/54d6e0691acbc86f790d7b5cd27de6f8.png");
-            const row = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
-                    .setLabel('Test')
-                    .setStyle('PRIMARY')
-                    .setCustomId('testign'),
-                    new MessageButton()
-                    .setLabel('Test')
-                    .setStyle('SECONDARY')
-                    .setCustomId('testign1'),
-                    new MessageButton()
-                    .setLabel('Test')
-                    .setStyle('DANGER')
-                    .setCustomId('testign2'),
-                    new MessageButton()
-                    .setLabel('Test')
-                    .setStyle('SUCCESS')
-                    .setCustomId('testign3')
-                    
-            );
-
-    message.reply({ embeds:[holyhsit], components:[row] });
-  }
 
   cmd.breakbot = async function(msgg, message) {
     if(!isTrusted(message.author.id, message)) {
@@ -2589,17 +2460,6 @@ cmd.render = async function(msgg, message) {
       "id": who.id,
       "name": who.username
     });
-  }
-
-  cmd.convertMesh = async function(msgg, message) {
-    if(msgg[1]) {
-        let something = await axios.get(msgg[1], {
-          responseType: "arraybuffer"
-        });
-        let converted = rablaxlib.newToText(something.data);
-        let atatchm = new DiscordJS.MessageAttachment(Buffer.from(converted), 'converted.mesh');
-        await message.reply({ files:[atatchm] });
-    }
   }
 
   cmd.getAllVersions = async function(msgg, message) {
@@ -2699,7 +2559,7 @@ cmd.render = async function(msgg, message) {
 	  linerand = "No way in hell";
 	}
     let holyhsit = new MessageEmbed()
-            .setTitle("The balls says...")
+            .setTitle("The magic sphere says...")
             .setDescription(linerand);
             const row = new MessageActionRow()
             .addComponents(
@@ -2711,6 +2571,8 @@ cmd.render = async function(msgg, message) {
 
     message.reply({ embeds:[holyhsit], components:[row] });
   }
+
+  register("ball", "8 ball");
   
   cmd.reload = async function(msgg, message) {
     if (!isTrusted(message.author.id)) {
@@ -2758,7 +2620,7 @@ cmd.render = async function(msgg, message) {
 
 reload("Start");
   
-function filterMessage(message) { //Meant for UTels
+function filterMessage(message) {
   for (var i=0; i < words.length; i++) {
 
    if (message.content.includes(words[i])) {
@@ -2854,10 +2716,13 @@ client.on('interactionCreate', async (interaction) => {
       console.log("original uid: "+origame+", author uid: "+athor);
       }
       if (btnInfo.isOwnerOnly) {
+        stat.incrementCounter("buttonPress", {attempted:true,btnId:buttonName});
         if (origame != athor && origame != null && origame != undefined) {
           await interaction.reply({ content:"This is NOT your interaction...", ephemeral: true });
           return;
         }
+      } else {
+        stat.incrementCounter("buttonPress", {attempted:false,btnId:buttonName});
       }
       await client.buttonCommands.get(buttonName)(interaction);
       } catch(balls) {
@@ -2871,6 +2736,7 @@ client.on('interactionCreate', async (interaction) => {
 client.on("guildCreate", async (guild) => {
     console.log("New guild:");
     console.log(guild);
+    stat.incrementCounter("addedToGuilds", {guild:guild.id});
     await guild.commands.set(client.commandList);
 });
 
@@ -2880,10 +2746,14 @@ client.on("messageCreate", async (message) => { //fires when it reads a message
   // logging stuff 2
   const authorId = message.author.id;
   const authorName = message.author.username;
+  /*
   saveMessage(message);
+  */
   if (message.channel.type == 'DM') {
+  /*
        console.log("dm channel!!!");
   } else {
+  */
        filterMessage(message);
   }
   console.log(`author: ${authorName}`);

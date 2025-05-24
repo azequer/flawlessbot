@@ -22,6 +22,8 @@
     "express": "^4.18.2",
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^5.2.0",
+    "image-data-uri": "^2.0.1",
+    "images-scraper": "^7.0.0",
     "jsdom": "^23.0.1",
     "libsodium-wrappers": "^0.7.11",
     "mojang-lib": "^1.13.2",
